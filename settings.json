@@ -1,0 +1,27 @@
+{
+    "sp": {
+        "entityId": "http://localhost:5000/metadata/",
+        "assertionConsumerService": {
+            "url": "http://localhost:5000/sso/acs",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+        },
+        "singleLogoutService": {
+            "url": "http://localhost:5000/sso/sls",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "x509cert": "",
+        "privateKey": ""
+    },
+    "idp": {
+        "entityId": "https://WIN-VPPBLHAA841.jags.local/adfs/services/trust",
+        "singleSignOnService": {
+            "url": "https://WIN-VPPBLHAA841.jags.local/adfs/ls/",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "singleLogoutService": {
+            "url": "https://WIN-VPPBLHAA841.jags.local/adfs/ls/",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "x509cert": "-----BEGIN CERTIFICATE-----\\nMIIC8DCCAdigAwIBAgIQPgYjbzn7J61Pe9Ie1q1eVTANBgkqhkiG9w0BAQsFADA0\\nMTIwMAYDVQQDEylBREZTIFNpZ25pbmcgLSBXSU4tVlBQQkxIQUE4NDEuamFncy5s\\nb2NhbDAeFw0yNDEyMjgxMDQzNDdaFw0yNTEyMjgxMDQzNDdaMDQxMjAwBgNVBAMT\\nKUFERlMgU2lnbmluZyAtIFdJTi1WUFBCTEhBQTg0MS5qYWdzLmxvY2FsMIIBIjAN\\nBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAypKgo5y5jJBcYPzpIZ3a52RFdyZI\\nYUa1lS1sEuCr6wddq+TOe3LStFtJaxxW4xhczt0qPfbHEdJ8yZwI7+2HPulhQD27\\nbVJgI/Kptg12svMV8jqPxD6EtgysIhTqUEH1WzdnxV1Hnn8fRdzZ7zx2hHr4UZLg\\nKVfjcr7LNVFLKH3z4kNR4Mr4TxoW66xuOrLZbw5YU6TzZi6tRCmP42ZP2686sCeZ\\n6LBTqXMh7nMNLL7TbhTMFIRHDx4CqxrcpI6bb3GioZ44TvAWJO/neBLo7GyByq1v\\n1/kit902CgcNwcgp2P69UCFACTu8Aa7/vcBSVC6/NdSZ2c5yUGw40cPkDQIDAQAB\\nMA0GCSqGSIb3DQEBCwUAA4IBAQBBXYoe4mIF7edTkq4Z5CyG1vKjf7Ai1Nkmu4b/\\nWNopz/BEFFp5hS8Xdyp9C6lBb/5UYnL+LFZr+YaK1OeOBDtymZ/Xt1EiXCOqJYwC\\nu4o8abgHUoOUcsDbTZ8pJVmpWtbU017iwo5kL2FJtfu3D1Doyigk++rRbF5EiBJG\\nlHBDDGjHXjNzr2afyf+KXYRrJAoxKoK2txEtWC9bxMB0c+oSEk8vue7isVsAoGkk\\n61GyuLl584p1XbnKwBRjvEm+IUHyc+HX3pKuWQWE+QgmxwyHUf/fxjVO4ZGOfDCi\\nvCTk9MJloczUbqqBaZoPC23SzzylHhTchUmEwln9Or7F38FP\\n-----END CERTIFICATE-----"
+    }
+}
