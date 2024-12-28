@@ -1,5 +1,4 @@
 $projectPath = "C:\Users\adfsSVC\Documents\adfs-sso"
-
 # Create project folder
 if (!(Test-Path $projectPath)) {
     New-Item -Path $projectPath -ItemType Directory
@@ -155,7 +154,7 @@ Set-Content -Path (Join-Path $templatesPath "dashboard.html") -Value $dashboardH
 $samlSettings = @"
 {
     "sp": {
-        "entityId": "http://localhost:5000/metadata/",
+        "entityId": "http://localhost:5000/metadata",
         "assertionConsumerService": {
             "url": "http://localhost:5000/sso/acs",
             "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
