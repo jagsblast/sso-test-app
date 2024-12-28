@@ -1,33 +1,54 @@
 {
-    "sp": {
-        "entityId": "https://localhost:5000/metadata/",
-        "assertionConsumerService": {
-            "url": "https://localhost:5000/sso/acs",
-            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-        },
-        "singleLogoutService": {
-            "url": "https://localhost:5000/sso/sls",
-            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-        },
-        "x509cert": "",
-        "privateKey": ""
+  "sp": {
+    "entityId": "https://win-vppblhaa841.jags.local:5000/metadata/",
+    "assertionConsumerService": {
+      "url": "https://win-vppblhaa841.jags.local:5000/sso/acs",
+      "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     },
-    "idp": {
-        "entityId": "https://WIN-VPPBLHAA841.jags.local/adfs/services/trust",
-        "singleSignOnService": {
-            "url": "https://WIN-VPPBLHAA841.jags.local/adfs/ls/",
-            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-        },
-        "singleLogoutService": {
-            "url": "https://WIN-VPPBLHAA841.jags.local/adfs/ls/",
-            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-        },
-        "x509cert": "-----BEGIN CERTIFICATE-----\\nMIIC8DCCAdigAwIBAgIQPgYjbzn7J61Pe9Ie1q1eVTANBgkqhkiG9w0BAQsFADA0\\nMTIwMAYDVQQDEylBREZTIFNpZ25pbmcgLSBXSU4tVlBQQkxIQUE4NDEuamFncy5s\\nb2NhbDAeFw0yNDEyMjgxMDQzNDdaFw0yNTEyMjgxMDQzNDdaMDQxMjAwBgNVBAMT\\nKUFERlMgU2lnbmluZyAtIFdJTi1WUFBCTEhBQTg0MS5qYWdzLmxvY2FsMIIBIjAN\\nBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAypKgo5y5jJBcYPzpIZ3a52RFdyZI\\nYUa1lS1sEuCr6wddq+TOe3LStFtJaxxW4xhczt0qPfbHEdJ8yZwI7+2HPulhQD27\\nbVJgI/Kptg12svMV8jqPxD6EtgysIhTqUEH1WzdnxV1Hnn8fRdzZ7zx2hHr4UZLg\\nKVfjcr7LNVFLKH3z4kNR4Mr4TxoW66xuOrLZbw5YU6TzZi6tRCmP42ZP2686sCeZ\\n6LBTqXMh7nMNLL7TbhTMFIRHDx4CqxrcpI6bb3GioZ44TvAWJO/neBLo7GyByq1v\\n1/kit902CgcNwcgp2P69UCFACTu8Aa7/vcBSVC6/NdSZ2c5yUGw40cPkDQIDAQAB\\nMA0GCSqGSIb3DQEBCwUAA4IBAQBBXYoe4mIF7edTkq4Z5CyG1vKjf7Ai1Nkmu4b/\\nWNopz/BEFFp5hS8Xdyp9C6lBb/5UYnL+LFZr+YaK1OeOBDtymZ/Xt1EiXCOqJYwC\\nu4o8abgHUoOUcsDbTZ8pJVmpWtbU017iwo5kL2FJtfu3D1Doyigk++rRbF5EiBJG\\nlHBDDGjHXjNzr2afyf+KXYRrJAoxKoK2txEtWC9bxMB0c+oSEk8vue7isVsAoGkk\\n61GyuLl584p1XbnKwBRjvEm+IUHyc+HX3pKuWQWE+QgmxwyHUf/fxjVO4ZGOfDCi\\nvCTk9MJloczUbqqBaZoPC23SzzylHhTchUmEwln9Or7F38FP\\n-----END CERTIFICATE-----"
+    "singleLogoutService": {
+      "url": "https://win-vppblhaa841.jags.local:5000/sso/sls",
+      "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
     },
-    "security": {
-        "wantAssertionsSigned": true,
-        "wantMessagesSigned": true,
-        "signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-        "digestAlgorithm": "http://www.w3.org/2001/04/xmlenc#sha256"
-    }
+
+    "x509cert": "",
+    "privateKey": ""
+  },
+
+  "idp": {
+    "entityId": "https://WIN-VPPBLHAA841.jags.local/adfs/services/trust",
+    "singleSignOnService": {
+      "url": "https://WIN-VPPBLHAA841.jags.local/adfs/ls/",
+      "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+    },
+    "singleLogoutService": {
+      "url": "https://WIN-VPPBLHAA841.jags.local/adfs/ls/",
+      "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+    },
+
+    "x509cert": "-----BEGIN CERTIFICATE-----\n\
+MIIC8DCCAdigAwIBAgIQPgYjbzn7J61Pe9Ie1q1eVTANBgkqhkiG9w0BAQsFADA0\n\
+MTIwMAYDVQQDEylBREZTIFNpZ25pbmcgLSBXSU4tVlBQQkxIQUE4NDEuamFncy5s\n\
+b2NhbDAeFw0yNDEyMjgxMDQzNDdaFw0yNTEyMjgxMDQzNDdaMDQxMjAwBgNVBAMT\n\
+KUFERlMgU2lnbmluZyAtIFdJTi1WUFBCTEhBQTg0MS5qYWdzLmxvY2FsMIIBIjAN\n\
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAypKgo5y5jJBcYPzpIZ3a52RFdyZI\n\
+YUa1lS1sEuCr6wddq+TOe3LStFtJaxxW4xhczt0qPfbHEdJ8yZwI7+2HPulhQD27\n\
+bVJgI/Kptg12svMV8jqPxD6EtgysIhTqUEH1WzdnxV1Hnn8fRdzZ7zx2hHr4UZLg\n\
+KVfjcr7LNVFLKH3z4kNR4Mr4TxoW66xuOrLZbw5YU6TzZi6tRCmP42ZP2686sCeZ\n\
+6LBTqXMh7nMNLL7TbhTMFIRHDx4CqxrcpI6bb3GioZ44TvAWJO/neBLo7GyByq1v\n\
+1/kit902CgcNwcgp2P69UCFACTu8Aa7/vcBSVC6/NdSZ2c5yUGw40cPkDQIDAQAB\n\
+MA0GCSqGSIb3DQEBCwUAA4IBAQBBXYoe4mIF7edTkq4Z5CyG1vKjf7Ai1Nkmu4b/\n\
+WNopz/BEFFp5hS8Xdyp9C6lBb/5UYnL+LFZr+YaK1OeOBDtymZ/Xt1EiXCOqJYwC\n\
+u4o8abgHUoOUcsDbTZ8pJVmpWtbU017iwo5kL2FJtfu3D1Doyigk++rRbF5EiBJG\n\
+lHBDDGjHXjNzr2afyf+KXYRrJAoxKoK2txEtWC9bxMB0c+oSEk8vue7isVsAoGkk\n\
+61GyuLl584p1XbnKwBRjvEm+IUHyc+HX3pKuWQWE+QgmxwyHUf/fxjVO4ZGOfDCi\n\
+vCTk9MJloczUbqqBaZoPC23SzzylHhTchUmEwln9Or7F38FP\n\
+-----END CERTIFICATE-----"
+  },
+
+  "security": {
+    "wantAssertionsSigned": true,
+    "wantMessagesSigned": false,
+    "signatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+    "digestAlgorithm": "http://www.w3.org/2001/04/xmlenc#sha256"
+  }
 }
