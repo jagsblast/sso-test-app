@@ -16,11 +16,14 @@ def init_saml_auth(req):
 
 def prepare_flask_request(request):
     """Prepare request object for SAML."""
+    # Detect proxy headers if the app is behind a proxy
+    server_port = request.environ.get('HTTP_X_FORWARDED_PORT', request.environ.get('SERVER_PORT', '443'))
+    
     return {
-        "https": "on" if request.scheme == "https" else "off",
-        "http_host": request.host,
+        "https": "on" if request.environ.get('HTTP_X_FORWARDED_PROTO', request.scheme) == "https" else "off",
+        "http_host": request.environ.get('HTTP_X_FORWARDED_HOST', request.host),
         "script_name": request.path,
-        "server_port": request.environ.get("SERVER_PORT", "443"),
+        "server_port": server_port,
         "get_data": request.args.copy(),
         "post_data": request.form.copy(),
     }
