@@ -57,51 +57,40 @@ def acs():
     req = prepare_flask_request(request)
     auth = init_saml_auth(req)
 
-    # Extract and log raw SAMLResponse
+    # Extract and decode the SAML response
     saml_response = request.form.get('SAMLResponse')
-    if saml_response:
-        print("Raw SAMLResponse (Base64):")
-        print(saml_response)
-
-        try:
+    decoded_response = ""
+    try:
+        if saml_response:
             decoded_response = base64.b64decode(saml_response).decode('utf-8')
-            pretty_xml = parseString(decoded_response).toprettyxml()
-            print("Decoded SAMLResponse (XML):")
-            print(pretty_xml)
-        except Exception as e:
-            print(f"Failed to decode SAMLResponse: {e}")
+    except Exception as e:
+        return f"Failed to decode SAMLResponse: {e}", 400
 
-    # Process the SAML response
+    # Process the response
     auth.process_response()
     errors = auth.get_errors()
+    error_reason = auth.get_last_error_reason()
 
-    if errors:
-        error_reason = auth.get_last_error_reason()
-        print(f"SAML Errors: {errors}")
-        print(f"Detailed Error Reason: {error_reason}")
-        return (
-            f"<h1>Error during SAML authentication</h1>"
-            f"<p>Errors: {errors}</p>"
-            f"<p>Reason: {error_reason}</p>",
-            400
-        )
-
-    if not auth.is_authenticated():
-        print("Authentication failed: User not authenticated")
-        return (
-            "<h1>User not authenticated</h1>"
-            "<p>Please check the SAML response for issues.</p>",
-            403
-        )
-
-    user_data = {
-        "name_id": auth.get_nameid(),
-        "session_index": auth.get_session_index(),
-        "attributes": auth.get_attributes(),
+    # Gather diagnostics
+    diagnostics = {
+        "Raw SAMLResponse (Base64)": saml_response or "No SAMLResponse provided",
+        "Decoded SAMLResponse (XML)": decoded_response or "Failed to decode SAMLResponse",
+        "SAML Errors": errors or "No errors",
+        "Last Error Reason": error_reason or "No detailed error reason",
+        "Is Authenticated": auth.is_authenticated(),
+        "NameID": auth.get_nameid() or "None",
+        "Session Index": auth.get_session_index() or "None",
+        "Attributes": auth.get_attributes() or "None",
     }
-    print("User authenticated successfully:")
-    print(f"User data: {user_data}")
-    return render_template("dashboard.html", user_data=user_data)
+
+    # Format diagnostics as HTML
+    html_output = "<h1>SAML Diagnostics</h1><ul>"
+    for key, value in diagnostics.items():
+        html_output += f"<li><strong>{key}:</strong><pre>{value}</pre></li>"
+    html_output += "</ul>"
+
+    # Return diagnostics as a response
+    return html_output, 400 if errors else 200
 
 @app.route("/sso/logout")
 def logout():
