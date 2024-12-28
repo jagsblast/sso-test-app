@@ -1,114 +1,69 @@
-from flask import Flask, request, redirect, render_template, Response
-from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.settings import OneLogin_Saml2_Settings
 import os
-import base64
-from xml.dom.minidom import parseString
+import requests
+from flask import Flask, request, redirect, render_template, session, url_for
+from onelogin.saml2.auth import OneLogin_Saml2_Auth
+from onelogin.saml2.utils import OneLogin_Saml2_Utils
 
 app = Flask(__name__)
 
-# Configuration for SAML
-SAML_FOLDER = os.path.join(os.getcwd(), "saml")
+# Set the Flask secret key for session management
+app.secret_key = "your_secret_key"
 
-def init_saml_auth(req):
-    """Initialize SAML authentication object."""
-    return OneLogin_Saml2_Auth(req, custom_base_path=SAML_FOLDER)
+# Configure the base path for SAML
+PROJECT_DIRPATH = os.getcwd()  # Use current working directory as base
+SAML_FOLDER = os.path.join(PROJECT_DIRPATH, 'saml')
 
-def prepare_flask_request(request):
-    """Prepare request object for SAML."""
-    # Detect proxy headers if the app is behind a proxy
-    server_port = request.environ.get('HTTP_X_FORWARDED_PORT', request.environ.get('SERVER_PORT', '443'))
-    
+def prepare_request(flask_request):
+    """Prepare the request object for SAML."""
     return {
-        "https": "on" if request.environ.get('HTTP_X_FORWARDED_PROTO', request.scheme) == "https" else "off",
-        "http_host": request.environ.get('HTTP_X_FORWARDED_HOST', request.host),
-        "script_name": request.path,
-        "server_port": server_port,
-        "get_data": request.args.copy(),
-        "post_data": request.form.copy(),
+        "https": "on" if flask_request.scheme == "https" else "off",
+        "http_host": flask_request.host,
+        "script_name": flask_request.path,
+        "server_port": flask_request.environ.get("SERVER_PORT", "443"),
+        "get_data": flask_request.args.copy(),
+        "post_data": flask_request.form.copy(),
     }
 
-@app.route("/metadata")
-def metadata():
-    """Serve SAML metadata."""
-    saml_settings = OneLogin_Saml2_Settings(
-        {}, custom_base_path=SAML_FOLDER, sp_validation_only=True
-    )
-    metadata = saml_settings.get_sp_metadata()
-    errors = saml_settings.validate_metadata(metadata)
+@app.route("/adfs", methods=["GET", "POST"])
+def adfs_route():
+    """ADFS SSO/SLO entry point and processing."""
+    req = prepare_request(request)
+    auth = OneLogin_Saml2_Auth(req, custom_base_path=SAML_FOLDER)
 
-    if len(errors) > 0:
-        return f"Metadata validation errors: {errors}", 500
+    error = None
 
-    return Response(metadata, content_type="application/xml")
+    # Handle Single Sign-On (SSO)
+    if "sso" in request.args:
+        return redirect(auth.login())
 
-@app.route("/")
-def index():
-    """Home page."""
-    return render_template("index.html")
+    # Handle Assertion Consumer Service (ACS) callback
+    elif "acs" in request.args:
+        auth.process_response()
+        not_auth_warn = not auth.is_authenticated()
+        if not auth.get_errors():
+            # Store SAML user data in session
+            session["samlUserdata"] = auth.get_attributes()
+            self_url = OneLogin_Saml2_Utils.get_self_url(req)
+            if "RelayState" in request.form and self_url != request.form["RelayState"]:
+                return redirect(auth.redirect_to(request.form["RelayState"]))
+        elif auth.get_settings().is_debug_active():
+            error = auth.get_last_error_reason()
 
-@app.route("/sso")
-def sso():
-    """Start SSO process."""
-    req = prepare_flask_request(request)
-    auth = init_saml_auth(req)
-    return redirect(auth.login())
+    # Handle Single Logout (SLO)
+    elif "slo" in request.args:
+        session.clear()
+        return redirect(url_for("adfs_route"))
 
-@app.route("/sso/acs", methods=["POST"])
-def acs():
-    """Assertion Consumer Service (ACS) endpoint."""
-    req = prepare_flask_request(request)
-    auth = init_saml_auth(req)
+    # Process logged-in user data if available
+    if "samlUserdata" in session:
+        attributes = session["samlUserdata"]
+        user_id = attributes.get("USER_ID", [None])[0]
+        if user_id:
+            # Example of sending a request to Resource X
+            resourcex_data = requests.get(f"https://resourcex.com/{user_id}")
+            return render_template("data.html", data=resourcex_data.json())
 
-    # Extract and decode the SAML response
-    saml_response = request.form.get('SAMLResponse')
-    decoded_response = ""
-    try:
-        if saml_response:
-            decoded_response = base64.b64decode(saml_response).decode('utf-8')
-    except Exception as e:
-        return f"Failed to decode SAMLResponse: {e}", 400
-
-    # Process the response
-    auth.process_response()
-    errors = auth.get_errors()
-    error_reason = auth.get_last_error_reason()
-
-    # Gather diagnostics
-    diagnostics = {
-        "Raw SAMLResponse (Base64)": saml_response or "No SAMLResponse provided",
-        "Decoded SAMLResponse (XML)": decoded_response or "Failed to decode SAMLResponse",
-        "SAML Errors": errors or "No errors",
-        "Last Error Reason": error_reason or "No detailed error reason",
-        "Is Authenticated": auth.is_authenticated(),
-        "NameID": auth.get_nameid() or "None",
-        "Session Index": auth.get_session_index() or "None",
-        "Attributes": auth.get_attributes() or "None",
-    }
-
-    # Format diagnostics as HTML
-    html_output = "<h1>SAML Diagnostics</h1><ul>"
-    for key, value in diagnostics.items():
-        html_output += f"<li><strong>{key}:</strong><pre>{value}</pre></li>"
-    html_output += "</ul>"
-
-    # Return diagnostics as a response
-    return html_output, 400 if errors else 200
-
-@app.route("/sso/logout")
-def logout():
-    """Logout from the SSO session."""
-    req = prepare_flask_request(request)
-    auth = init_saml_auth(req)
-    return redirect(auth.logout())
-
-@app.route("/sso/sls")
-def sls():
-    """Single Logout Service (SLS) endpoint."""
-    req = prepare_flask_request(request)
-    auth = init_saml_auth(req)
-    auth.process_slo()
-    return redirect("/")
+    return render_template("index.html", error=error)
 
 if __name__ == "__main__":
     app.run(ssl_context=('cert.pem', 'key.pem'), host='0.0.0.0', port=5000)
