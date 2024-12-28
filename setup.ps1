@@ -19,16 +19,15 @@ if (!(Test-Path $templatesPath)) {
 
 # Create app.py
 $appCode = @"
-from flask import Flask, request, redirect, render_template, make_response
+from flask import Flask, request, redirect, render_template, make_response, Response
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
-from onelogin.saml2.utils import OneLogin_Saml2_Utils
-
+from onelogin.saml2.settings import OneLogin_Saml2_Settings
 import os
 
 app = Flask(__name__)
 
 # Configuration for SAML
-SAML_FOLDER = os.path.join(os.getcwd(), "saml")  # Store SAML settings and certs in the 'saml' folder
+SAML_FOLDER = os.path.join(os.getcwd(), "saml")
 
 def init_saml_auth(req):
     """Initialize SAML authentication object."""
@@ -46,6 +45,21 @@ def prepare_flask_request(request):
         "get_data": request.args.copy(),
         "post_data": request.form.copy(),
     }
+
+@app.route("/metadata")
+def metadata():
+    """Serve SAML metadata."""
+    saml_settings = OneLogin_Saml2_Settings(
+        {}, custom_base_path=SAML_FOLDER, sp_validation_only=True
+    )
+    metadata = saml_settings.get_sp_metadata()
+    errors = saml_settings.validate_metadata(metadata)
+
+    if len(errors) > 0:
+        return f"Metadata validation errors: {errors}", 500
+
+    response = Response(metadata, content_type="application/xml")
+    return response
 
 @app.route("/")
 def index():
