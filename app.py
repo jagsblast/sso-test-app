@@ -55,12 +55,10 @@ def acs():
     req = prepare_flask_request(request)
     auth = init_saml_auth(req)
 
-    # Debugging SAML response
+    # Log the raw SAML response
     saml_response = request.form.get('SAMLResponse')
     if saml_response:
-        print(f"SAML Response: {saml_response}")
-    else:
-        return "No SAMLResponse found in request.", 400
+        print(f"Raw SAMLResponse: {saml_response}")
 
     auth.process_response()
     errors = auth.get_errors()
