@@ -2,6 +2,8 @@ from flask import Flask, request, redirect, render_template, Response
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 import os
+import base64
+from xml.dom.minidom import parseString
 
 app = Flask(__name__)
 
@@ -55,26 +57,49 @@ def acs():
     req = prepare_flask_request(request)
     auth = init_saml_auth(req)
 
-    # Log the raw SAML response
+    # Extract and log raw SAMLResponse
     saml_response = request.form.get('SAMLResponse')
     if saml_response:
-        print(f"Raw SAMLResponse: {saml_response}")
+        print("Raw SAMLResponse (Base64):")
+        print(saml_response)
 
+        try:
+            decoded_response = base64.b64decode(saml_response).decode('utf-8')
+            pretty_xml = parseString(decoded_response).toprettyxml()
+            print("Decoded SAMLResponse (XML):")
+            print(pretty_xml)
+        except Exception as e:
+            print(f"Failed to decode SAMLResponse: {e}")
+
+    # Process the SAML response
     auth.process_response()
     errors = auth.get_errors()
 
     if errors:
+        error_reason = auth.get_last_error_reason()
         print(f"SAML Errors: {errors}")
-        return f"Error during SAML authentication: {errors}", 400
+        print(f"Detailed Error Reason: {error_reason}")
+        return (
+            f"<h1>Error during SAML authentication</h1>"
+            f"<p>Errors: {errors}</p>"
+            f"<p>Reason: {error_reason}</p>",
+            400
+        )
 
     if not auth.is_authenticated():
-        return "User not authenticated", 403
+        print("Authentication failed: User not authenticated")
+        return (
+            "<h1>User not authenticated</h1>"
+            "<p>Please check the SAML response for issues.</p>",
+            403
+        )
 
     user_data = {
         "name_id": auth.get_nameid(),
         "session_index": auth.get_session_index(),
         "attributes": auth.get_attributes(),
     }
+    print("User authenticated successfully:")
     print(f"User data: {user_data}")
     return render_template("dashboard.html", user_data=user_data)
 
